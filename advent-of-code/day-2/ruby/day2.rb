@@ -3,17 +3,19 @@ class Day2
     @input = File.readlines(input_file).map(&:chomp)
   end
 
+  def parsed_input
+    @parsed_input ||= @input.map {|line| line.split('x').map(&:to_i)}
+  end
+
   def part_1
-    @input.map do |lwh|
-      (l, w, h) = lwh.split('x').map(&:to_i)
+    parsed_input.map do |(l, w, h)|
       areas = [l*w, w*h, h*l]
       (2 * areas.inject(&:+)) + areas.min
     end.inject(&:+)
   end
 
   def part_2
-    @input.map do |lwh|
-      (l, w, h) = lwh.split('x').map(&:to_i)
+    parsed_input.map do |(l, w, h)|
       (2 * [l, w, h].sort[0, 2].inject(&:+)) + (l * w * h)
     end.inject(&:+)
   end
