@@ -1,0 +1,55 @@
+class Day6
+  def initialize(fname)
+    @input = File.readlines(fname).map(&:chomp)
+    @lights = Array.new(1000) { Array.new(1000, 0) }
+    parse_instructions
+    run_instructions
+    puts "total brightness is #{total_brightness}"
+    #puts "#{lit_count} lights are on"
+  end
+
+  def total_brightness
+    @lights.inject(0) {|total, arr| total += arr.inject(&:+)}
+  end
+
+  def lit_count
+    @lights.inject(0) {|total, arr| total += arr.count {|light_state| light_state}}
+  end
+
+  def run_instruction(i)
+    (com, (start_corner_x, start_corner_y), (end_corner_x, end_corner_y)) = i
+    start_corner_x.upto end_corner_x do |x|
+      start_corner_y.upto end_corner_y do |y|
+        @lights[x][y] = case com
+                        when :on
+                          @lights[x][y].succ
+                        when :off
+                          [@lights[x][y].pred, 0].max
+                        when :toggle
+                          @lights[x][y].succ.succ
+                        end
+      end
+    end
+  end
+
+  def run_instructions
+    @parsed.each {|i| run_instruction i}
+  end
+
+  def parse_instruction(i)
+    com = case i
+          when /^turn on/
+            :on
+          when /^turn off/
+            :off
+          when /^toggle/
+            :toggle
+          end
+    corners = i.match(/(\d+,\d+).*?(\d+,\d+)/)[1..2].map {|c| c.split(',').map(&:to_i)}
+    corners.unshift com
+  end
+
+  def parse_instructions
+    @parsed = @input.map {|l| parse_instruction l}
+  end
+end
